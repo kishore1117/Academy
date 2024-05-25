@@ -9,6 +9,9 @@ class UserModel {
 
     static validate(user) {
         const errors = [];
+        if(user.name == ""){
+            errors.push('name is required');
+        }
         if(user.name){
             if ( typeof user.name !== 'string') {
                 errors.push('name is required and must be a string');

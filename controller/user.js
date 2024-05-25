@@ -99,3 +99,14 @@ exports.getUser = async (req,res)=>{
     return res.status(500).json(err)
  }
 }
+
+exports.deleteUser = async (req,res)=>{
+    try{
+        const id = parseInt(req.params.id);
+        const queryText = 'DELETE FROM "user" WHERE id = $1';
+        await pool.query(queryText, [id]);
+        res.status(200).json({ message: 'Item deleted successfully' });
+    }catch(err){
+        res.status(500).json({ error: 'An internal server error occurred' });
+    }
+}
