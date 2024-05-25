@@ -1,16 +1,20 @@
 const pool = require('../db')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { password } = require('./testing');
+const UserModel = require('../models/user_model');
 require('dotenv').config();
 
 exports.signupUser = async (req,res) =>{
      try{
         let user = req.body
+        const errors = UserModel.validate(user);
         const hashedPassword = await bcrypt.hash(user.password, 10);
         const queryString = 'SELECT * from "user" WHERE email=$1'
        pool.query(queryString,[user.email],(err,result)=>{
             if(!err){
+                if (errors.length > 0) {
+                    return res.status(400).json({ errors });
+                }
                 if(result.rows.length <= 0){
                     pool.query(`INSERT INTO "user" (name,email,phone_number,password,role) VALUES($1, $2, $3, $4,'user')`,[user.name,user.email,user.phone_number,hashedPassword], (err) => {
                         if (err) {
@@ -57,17 +61,34 @@ catch{
 exports.updateUser = async (req,res)=>{
     try{
         const id = parseInt(req.params.id);
-        let {name,phone_number,role} = req.body;
-        const result = await pool.query('UPDATE "user" SET name = $1, phone_number = $2, role = $3 WHERE id = $4 RETURNING *',[name,phone_number,role,id]);
-        if(result.rowCount === 0){
-            return res.status(404).json({ message: 'Record not found' });
+        const user = req.body
+        const errors = UserModel.validate(user);
+        const updates = req.body;
+        const setClause = Object.keys(updates).map((key, index) => `${key} = $${index + 1}`).join(', ');
+        const values = Object.values(updates);
+        if (errors.length > 0) {
+            return res.status(400).json({ errors });
         }
-        res.json({ message: 'Record updated successfully' });
-    }
-    catch(err){
-        return res.status(500).json(err)
+        const query = {
+            text: `
+                UPDATE "user"
+                SET ${setClause}
+                WHERE id = $${Object.keys(updates).length + 1}
+                RETURNING name,email,phone_number,role
+            `,
+            values: [...values, id]
+        };
+        const result = await pool.query(query);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json({ message: 'User updated successfully', user: result.rows[0] });
+    }catch(err){
+        console.error('Error updating user:', err);
+        res.status(500).json({ message: 'Internal server error' });
     }
 }
+
 
 exports.getUser = async (req,res)=>{
  try{
@@ -77,4 +98,15 @@ exports.getUser = async (req,res)=>{
  }catch(err){
     return res.status(500).json(err)
  }
+}
+
+exports.deleteUser = async (req,res)=>{
+    try{
+        const id = parseInt(req.params.id);
+        const queryText = 'DELETE FROM "user" WHERE id = $1';
+        await pool.query(queryText, [id]);
+        res.status(200).json({ message: 'Item deleted successfully' });
+    }catch(err){
+        res.status(500).json({ error: 'An internal server error occurred' });
+    }
 }
