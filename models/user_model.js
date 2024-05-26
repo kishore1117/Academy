@@ -58,6 +58,7 @@ function isValidPassword(password) {
 
 UserModel.Roles = {
     USER: 'user',
-    ADMIN: 'admin'
+    ADMIN: 'admin',
+    SUPER_ADMIN:'super_admin'
 };
 module.exports = UserModel;

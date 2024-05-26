@@ -43,7 +43,7 @@ try{
         if(result.rows[0]?.email === user.email){
             const decrypt_password = await bcrypt.compare(user.password,result.rows[0].password)   
             if( decrypt_password){
-                const token = jwt.sign({username:result.rows[0].name,email:result.rows[0].email,number:result.rows[0].phone_number,role:result.rows[0].role}, process.env.ACCESS_TOKEN)
+                const token = jwt.sign({username:result.rows[0].name,email:result.rows[0].email,number:result.rows[0].phone_number,role:result.rows[0].role,franchise:result.rows[0].franchise_id}, process.env.ACCESS_TOKEN)
                 res.json({token})
             }else{
                 return res.status(400).json({ message: "Invalid password" });

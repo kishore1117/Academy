@@ -15,6 +15,9 @@ app.get("/users",auth.authenticateToken,checkRole.checkRole,user.getUser)
 app.post("/admin/franchise",auth.authenticateToken,checkRole.checkRole,admin.createFranchise)
 app.patch("/admin/franchise/:id",auth.authenticateToken,checkRole.checkRole,admin.updateFranchise)
 app.delete("/admin/franchise/:id",auth.authenticateToken,checkRole.checkRole,admin.deleteFranchise)
+app.post('/admin/location',auth.authenticateToken,checkRole.checkSuperAdminRole,admin.createLocation)
+app.patch('/admin/location/:id',auth.authenticateToken,checkRole.checkSuperAdminRole,admin.updateLocation)
+app.delete('/admin/location/:id',auth.authenticateToken,checkRole.checkSuperAdminRole,admin.deleteLocation)
 //PORT
 app.listen(8989, () => {
     console.log("Server is running on port 8989")
