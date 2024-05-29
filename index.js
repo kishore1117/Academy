@@ -3,6 +3,7 @@ const app = express();
 const user = require('./controller/user.js')
 const admin = require('./controller/admin.js');
 var auth = require("./service/authorization.js");
+const student =  require('./controller/student.js');
 var checkRole = require('./service/checkRole.js')
 
 //MIDDLEWARE
@@ -18,6 +19,12 @@ app.delete("/admin/franchise/:id",auth.authenticateToken,checkRole.checkRole,adm
 app.post('/admin/location',auth.authenticateToken,checkRole.checkSuperAdminRole,admin.createLocation)
 app.patch('/admin/location/:id',auth.authenticateToken,checkRole.checkSuperAdminRole,admin.updateLocation)
 app.delete('/admin/location/:id',auth.authenticateToken,checkRole.checkSuperAdminRole,admin.deleteLocation)
+app.post('/student',auth.authenticateToken,checkRole.checkRole,student.createStudent),
+app.patch('/student/:id',auth.authenticateToken,checkRole.checkRole,student.updateStudent)
+app.delete('/student/:id',auth.authenticateToken,checkRole.checkRole,student.deleteStudent)
+app.get('/student',auth.authenticateToken,checkRole.checkRole,student.getStudents)
+app.get('/location/students',auth.authenticateToken,checkRole.checkRole,student.getAllStudents)
+app.get('/location',auth.authenticateToken,checkRole.checkRole,admin.getLocation)
 //PORT
 app.listen(8989, () => {
     console.log("Server is running on port 8989")

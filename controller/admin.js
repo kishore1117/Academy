@@ -93,10 +93,9 @@ exports.createLocation = async (req,res) =>{
                 return res.status(403).json({ error: 'Failed to authenticate token' });
             }
             req.franchise_id = decoded.franchise;
-            console.log(req.franchise_id)
         });
-        const query = 'SELECT * FROM "location" WHERE name = $1';
-        pool.query(query,[name],(err,result)=>{
+        const query = 'SELECT * FROM "location" WHERE name = $1 and franchise_id = $2';
+        pool.query(query,[name,req.franchise_id],(err,result)=>{
             if(!err){
                 if(result.rows.length <= 0){
                     const franchise_id =  req.franchise_id
@@ -143,6 +142,31 @@ exports.updateLocation = async (req,res)=>{
         res.json({ message: 'location updated successfully', user: result.rows[0] });
     }catch(err){
         res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+exports.getLocation = async (req,res)=>{
+    try{
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1]
+        if (!token) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+        jwt.verify(token,process.env.ACCESS_TOKEN, (err, decoded) => {
+            if(err) {
+                return res.status(403).json({ error: 'Failed to authenticate token' });
+            }
+            req.franchise_id = decoded.franchise;
+        });
+        const query = req.query.franchise_id;
+        const queryString = `SELECT * from "location" WHERE franchise_id =$1`;
+        const result = await pool.query(queryString,[query]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Location not found' });
+        }
+        res.json({location: result.rows });
+    }catch(err){
+        res.status(500).json({ message: 'Internal server error'});
     }
 }
 
