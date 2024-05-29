@@ -9,6 +9,9 @@ class UserModel {
 
     static validate(user) {
         const errors = [];
+        if(user.name == ""){
+            errors.push('name is required');
+        }
         if(user.name){
             if ( typeof user.name !== 'string') {
                 errors.push('name is required and must be a string');
@@ -55,6 +58,7 @@ function isValidPassword(password) {
 
 UserModel.Roles = {
     USER: 'user',
-    ADMIN: 'admin'
+    ADMIN: 'admin',
+    SUPER_ADMIN:'super_admin'
 };
 module.exports = UserModel;

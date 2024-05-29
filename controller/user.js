@@ -43,7 +43,7 @@ try{
         if(result.rows[0]?.email === user.email){
             const decrypt_password = await bcrypt.compare(user.password,result.rows[0].password)   
             if( decrypt_password){
-                const token = jwt.sign({username:result.rows[0].name,email:result.rows[0].email,number:result.rows[0].phone_number,role:result.rows[0].role}, process.env.ACCESS_TOKEN)
+                const token = jwt.sign({username:result.rows[0].name,email:result.rows[0].email,number:result.rows[0].phone_number,role:result.rows[0].role,franchise:result.rows[0].franchise_id}, process.env.ACCESS_TOKEN)
                 res.json({token})
             }else{
                 return res.status(400).json({ message: "Invalid password" });
@@ -98,4 +98,15 @@ exports.getUser = async (req,res)=>{
  }catch(err){
     return res.status(500).json(err)
  }
+}
+
+exports.deleteUser = async (req,res)=>{
+    try{
+        const id = parseInt(req.params.id);
+        const queryText = 'DELETE FROM "user" WHERE id = $1';
+        await pool.query(queryText, [id]);
+        res.status(200).json({ message: 'Item deleted successfully' });
+    }catch(err){
+        res.status(500).json({ error: 'An internal server error occurred' });
+    }
 }
