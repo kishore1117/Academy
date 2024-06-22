@@ -1,4 +1,3 @@
-const { text } = require('express');
 const pool = require('../db');
 
 
@@ -10,7 +9,7 @@ exports.createStudent = async (req,res)=>{
             if(!err){
                 if(result.rows.length <= 0){
                     const insertQuery = `INSERT INTO "student" (name,client_unique_id,birth_date,email,phone_number,school,kit_bag,cricket_role,student_type,location_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING name,client_unique_id,birth_date,email,phone_number,school,kit_bag,cricket_role,student_type,location_id`
-                    const result =  await pool.query(insertQuery,[student.name,student.client_unique_id,student.birth_date,student.email,student.phone_number,student.school,student.kit_bag,student.cricket_role,student.student_type,student.location])
+                    const result =  await pool.query(insertQuery,[student.name,student.client_unique_id,student.birth_date,student.email,student.phone_number,student.school,student.kit_bag,student.cricket_role,student.student_type,student.location_id])
                         res.status(201).json({ message:'User created successfully', student:result.rows[0]});
                 }
                 else{
@@ -74,7 +73,6 @@ exports.getStudents =  async (req,res)=>{
             values:[id]
         }
         const result = await pool.query(query);
-        console.log(query.text)
         res.json(result.rows);
        }catch(err){
           return res.status(500).json(err)
@@ -83,7 +81,6 @@ exports.getStudents =  async (req,res)=>{
 
 exports.getAllStudents =  async(req,res)=>{
     try{
-        console.log(req.query)
         const queryString = 'SELECT student.id,student.name,student.client_unique_id,student.birth_date,student.phone_number,student.email,student.image_url,student.school,student.kit_bag,student.cricket_role,student.student_type FROM "student" WHERE student.location_id = $1' 
         const id = req.query.location_id;
         const result = await pool.query(queryString,[id]);

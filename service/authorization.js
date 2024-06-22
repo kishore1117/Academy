@@ -2,8 +2,14 @@ require('dotenv').config()
 const jwt = require('jsonwebtoken')
 
 function authenticateToken(req,res,next){
-    const authHeader = req.rawHeaders[1]
-    const token = authHeader && authHeader.split(' ')[1]
+    const rawHeaders = req.rawHeaders;
+    for (let i = 0; i < rawHeaders.length; i += 2) {
+        if (rawHeaders[i].toLowerCase() === 'authorization') {
+         token = rawHeaders[i + 1];
+          break;
+        }
+      }
+    token = token && token.split(' ')[1]
     if(token == null)
     return   res.status(401).json({ error: { code: 'CUSTOM_ERROR', message: 'Unauthorized' } });
 

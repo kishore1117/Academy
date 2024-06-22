@@ -170,6 +170,26 @@ exports.getLocation = async (req,res)=>{
     }
 }
 
+exports.getLocationById = async (req,res)=>{
+    try{
+        const id = parseInt(req.params.id);
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1]
+        if (!token) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+        const queryString = 'SELECT * from "location" WHERE id=$1';
+        const result =  await pool.query(queryString,[id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Location not found' });
+        }
+        res.json(result.rows[0] );
+    }
+    catch{
+        res.status(500).json({ message: 'Internal server error'});
+    }
+}
+
 exports.deleteLocation = async (req,res)=>{
     try{
         const id = parseInt(req.params.id);
