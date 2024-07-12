@@ -13,6 +13,7 @@ app.use(express.json())
 app.use(cors());
 app.post("/signup",user.signupUser)
 app.post("/login",user.loginUser)
+app.post('/forgotpassword',user.forgotPassword)
 app.patch("/user/:id",auth.authenticateToken,checkRole.checkRole,user.updateUser)
 app.delete('/user/:id',auth.authenticateToken,checkRole.checkRole,user.deleteUser)
 app.get("/users",auth.authenticateToken,checkRole.checkRole,user.getUser)
@@ -31,6 +32,8 @@ app.get('/location',auth.authenticateToken,checkRole.checkRole,admin.getLocation
 app.get('/location/:id',auth.authenticateToken,checkRole.checkRole,admin.getLocationById)
 app.get('/search',auth.authenticateToken,checkRole.checkRole,comman.search)
 app.get('/filter',auth.authenticateToken,checkRole.checkRole,comman.filter)
+app.get('/current',auth.authenticateToken,user.currentUser)
+
 //PORT
 app.listen(8989, () => {
     console.log("Server is running on port 8989")
